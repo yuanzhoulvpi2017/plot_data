@@ -1,0 +1,75 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+
+url <- "https://image.baidu.com/search/acjson?tn=resultjson_com&ipn=rj&ct=201326592&is=&fp=result&queryWord=tesla&cl=2&lm=-1&ie=utf-8&oe=utf-8&adpicid=&st=-1&z=&ic=&hd=&latest=&copyright=&word=tesla&s=&se=&tab=&width=&height=&face=0&istype=2&qc=&nc=1&fr=&expermode=&force=&pn=30&rn=30&gsm=1e&1584721299699="
+
+library(jsonlite)
+
+all_image_link <- fromJSON(url)
+```
+
+```{r}
+download.file(url = "https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=2296769707,666155720&fm=26&gp=0.jpg",
+              destfile = "test_car.jpg",
+              mode = 'wb')
+```
+
+```{r}
+all_image_link <- all_image_link[["data"]][["thumbURL"]]
+```
+
+```{r}
+all_clearn_link <- all_image_link[which(!is.na(all_image_link))]
+```
+
+```{r}
+for (i in seq_along(all_clearn_link)) {
+  
+  # i <- 3
+  Sys.sleep(3)
+  download.file(url = all_clearn_link[i],
+                destfile = paste0("tesla_", i, ".jpg"),
+                mode = 'wb')
+  
+}
+```
+
+```{r}
+base_code_part_1 <- "https://image.baidu.com/search/acjson?tn=resultjson_com&ipn=rj&ct=201326592&is=&fp=result&queryWord=tesla&cl=2&lm=-1&ie=utf-8&oe=utf-8&adpicid=&st=-1&z=&ic=&hd=&latest=&copyright=&word=tesla&s=&se=&tab=&width=&height=&face=0&istype=2&qc=&nc=1&fr=&expermode=&force=&pn="
+
+base_code_part_2 <- "&rn=30"
+i <- 15
+base_url <- paste0(base_code_part_1, 30 * i, base_code_part_2)
+base_url
+```
+```{r}
+for (i in c(1:5)) {
+  #设置page链接
+  page_url <- paste0(base_code_part_1, 30 * i, base_code_part_2)
+  page_data <- fromJSON(page_url)
+  #sub link
+  image_url_on_page <- page_data[["data"]][["thumbURL"]]
+  image_url_on_page <- image_url_on_page[which(!is.na(image_url_on_page))]
+  
+  for (j in seq_along(image_url_on_page)) {
+    # i <- 3; j <- 5
+    
+    image_name_temp <- paste0("tesla_", i, "_", j, '.jpg')
+    
+    download.file(url = image_url_on_page[j],
+                  destfile = image_name_temp,
+                  mode = 'wb',
+                  quiet = TRUE)
+    message(image_name_temp)
+    Sys.sleep(2)
+    
+  }
+}
+```
+
+
+
