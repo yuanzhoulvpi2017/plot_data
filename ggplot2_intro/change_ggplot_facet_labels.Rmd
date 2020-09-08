@@ -1,0 +1,202 @@
+---
+title: "R Notebook"
+output:
+  word_document: default
+  html_notebook: default
+---
+# 获得更多内容：欢迎关注我的公众号：pypi。一个圆周率。
+
+
+# 1 准备部分
+```{r}
+library(tidyverse) # tidyverse里面已经包含ggplot2
+# library(ggplot2)
+theme_set( # 这里是设置接下来默认的theme类型
+  theme_light() + theme(legend.position = "top")
+  )
+```
+
+# 2 设置一个基础的分面
+```{r}
+# Load data and convert dose to a factor variable
+data("ToothGrowth")
+ToothGrowth$dose <- as.factor(ToothGrowth$dose)
+
+# Box plot, facet accordding to the variable dose and supp
+p <- ggplot(ToothGrowth, aes(x = dose, y = len)) + 
+  geom_boxplot(aes(fill = supp), position = position_dodge(0.9)) +
+  scale_fill_viridis_d() 
+p + facet_grid(dose ~ supp)
+```
+
+## 2.1 改变分面的标签内容
+其实要注意的是上面各个面板里面的标签叫的`OJ`、`VC`都是x轴方向的。右边的0.5、1、2都是y轴方向的。这个一定要注意！！！
+
+在下面的里面，给labeller传递一个lable_both就可以将分面的标签加上这个分面的label。
+```{r}
+p + facet_grid(dose ~ supp, labeller = label_both)
+```
+
+如果希望修改的类型更多，那就要自己定义，就像是下面这样：
+```{r}
+# New facet label names for dose variable
+dose.labs <- c("D0.5", "D1", "D2") # 这个是我们希望展示出来的标签名
+names(dose.labs) <- c("0.5", "1", "2")  # 这个是我们希望隐藏的标签名
+
+# New facet label names for supp variable
+supp.labs <- c("Orange Juice", "Vitamin C") # 这个是我们希望展示出来的标签名
+names(supp.labs) <- c("OJ", "VC") # 这个是我们希望隐藏的标签名
+
+# 在下面，使用labeller函数，传递给labeller参数就可以了
+# Create the plot
+p + facet_grid(
+  dose ~ supp, 
+  labeller = labeller(dose = dose.labs, supp = supp.labs)
+  )
+```
+
+当然，我们还可以直接修改原始数据，然后在画图分面，这样效果是一样的，但是感觉可能更加的麻烦和危险，因为这涉及到修改数据。
+```{r}
+df <- ToothGrowth
+# Modify the data
+df$dose <- factor(df$dose, levels = c("0.5", "1", "2"), 
+                  labels = c("D0.5", "D1", "D2"))
+df$supp <- factor(df$supp, levels = c("OJ", "VC"),
+                  labels = c("Orange Juice", "Vitamin C")
+                  )
+# Create the plot
+ggplot(df, aes(x = dose, y = len)) + 
+  geom_boxplot(aes(fill = supp)) +
+  facet_grid(dose ~ supp)
+```
+
+分面的label的内容修改好了，如何修改样式
+
+## 2.2 分面label字体怎么修改
+
+分面背景修改的参数在theme里面是strip.text.x
+```{r}
+# Change facet text font. Possible values for the font style:
+  #'plain', 'italic', 'bold', 'bold.italic'.
+p + facet_grid(dose ~ supp)+
+    theme(
+      strip.text.x = element_text(
+        size = 12, color = "red", face = "bold.italic"
+        ), # 这里设置x轴方向的字体类型，
+      strip.text.y = element_text(
+        size = 12, color = "red", face = "bold.italic"
+        ) # 这里设置y轴方向的字体类型，
+      )
+```
+
+
+既然各个分面的label都处理好了，下面就要处理分面label处的背景。也就是后面那个灰灰的地方。
+
+## 3 分面的label的背景
+
+分面label的背景设置是theme里面的strip.background调整，设置一串element_rect给他，就能得到意想不到的结果
+```{r}
+p + facet_grid(dose ~ supp)+
+ theme(
+   strip.background = element_rect(
+     color="black", fill="#FC4E07", size=1.5, linetype="solid"
+     )
+   )
+```
+
+其实和上面一样，如果希望细分x轴方向的和y轴方向的不一样，就要对strip.background的不同后缀设置，看代码
+```{r}
+p + facet_grid(dose ~ supp)+
+ theme(
+   strip.background.x = element_rect(
+     color="black", fill="#FC4E07", size=1.5, linetype="solid"
+     ),
+   strip.background.y = element_rect(
+     color="black", fill="green", size=1.5, linetype="solid"
+     )
+   )
+```
+
+## 4 修改分面的各个panel的边框颜色
+设置各个分面的panel的边框的颜色还是`panel.border`,对应的输入格式是element_rect。
+```{r}
+p + facet_grid(dose ~ supp)+
+ theme(
+   strip.background.x = element_rect(
+     color="black", fill="#FC4E07", size=1.5, linetype="solid"
+     ),
+   strip.background.y = element_rect(
+     color="black", fill="green", size=1.5, linetype="solid"
+     ),
+   panel.border = element_rect(color = 'red')
+   )
+```
+## 5 修改分面标签和panel的位置
+
+### 5.1 分面标签在panel的里面还是外面
+
+另外如果希望这个`label`的矩形框在`panel`内还是在panel外怎么设置？
+太简单了，设置`strip.placement`等于`outside`，还是`inside`就可以了
+
+```{r}
+p + facet_grid(dose ~ supp)+
+ theme(
+   strip.background.x = element_rect(
+     color="black", fill="#FC4E07", size=1.5, linetype="solid"
+     ),
+   strip.background.y = element_rect(
+     color="black", fill="green", size=1.5, linetype="solid"
+     ),
+   strip.placement = "outside",
+   )
+```
+### 5.2 分面标签距离面板panel的距离
+
+如何让标签距离面板更远或者更近呢？，可以使用`strip.switch.pad.grid`或者`strip.switch.pad.wrap`。他们修改的参数需要是`unit`样子的，比如：`unit(2, "cm")`.实际上这个unit里面有很多参数，可以查看帮助了解更多。
+```{r}
+p + facet_grid(dose ~ supp)+
+ theme(
+   strip.background.x = element_rect(
+     color="black", fill="#FC4E07", size=1.5, linetype="solid"
+     ),
+   strip.background.y = element_rect(
+     color="black", fill="green", size=1.5, linetype="solid"
+     ),
+   strip.placement = "inside",
+   strip.switch.pad.grid = unit(2, "cm"),
+   strip.switch.pad.wrap = unit(2, "cm")
+   )
+```
+
+## 6 各个面板之间的距离
+
+在分面后，各个`panel`之间的间隔特别小怎么办？实际上通过`panel.spacing`这个参数来修改，需要传递的对象依旧是 `unit`。实际上，细分就是`panel.spacing.x`和`panel.spacing.y`。他们都需要unit来设置，具体代码。其实之前是`panel.margin`。但是这个被删掉了，所以，就不要使用了。
+```{r}
+p + facet_grid(dose ~ supp)+
+ theme(
+   panel.spacing.x = unit(1, "cm"),
+   panel.spacing.y = unit(2, "cm")
+   )
+```
+
+
+# 总结一下
+设置分面的`label`包含以下几个内容
+1. 设置分面的`label`的内容：修改方式是修改`labeller`参数。这个参数要求的是`labeller_`开头的一系列东西。
+
+2. 设置分面的`label`的字体：这个是设置`strip.text`、`strip.text.x`、`strip.text.y`、要求传递的是`element_text`。
+
+3. 设置分面`label`的背景: 这个是设置`strip.background`、`strip.background.x`、`strip.background.x`，要求传递的参数是`element_rect`。
+
+4. 设置分面`label`的对应的`panel`的边框颜色还是使用`panel.border`。
+
+5 设置分面`label`的位置在`panel`内还是在`panel`外，使用`strip.placement`。
+
+6 我不想介绍了，仔细看看我上面写的，和help。基本上就没问题了。
+
+
+
+参考链接：https://www.datanovia.com/en/blog/how-to-change-ggplot-facet-labels/
+
+
+
