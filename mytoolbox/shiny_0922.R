@@ -156,7 +156,10 @@ server <- function(input, output, session) {
     if (!dir.exists("pypi_result")) {
       dir.create("pypi_result")
     }
-    ttest_filename <- paste0(getwd(), "/pypi_result/", Sys.time(), ".csv")
+    currenttime <- Sys.time()
+    currenttime <- str_replace_all(str_replace_all(currenttime, pattern = ":", replacement = "_"), pattern = " ", replacement = "_")
+
+    ttest_filename <- paste0(getwd(), "/pypi_result/", currenttime, ".csv")
     write_csv(x = final_ttest, path = ttest_filename)
     showNotification(paste0("data has been saved in: ", ttest_filename), duration = 1000, closeButton = TRUE)
     
@@ -168,3 +171,5 @@ server <- function(input, output, session) {
 }
 
 shinyApp(ui, server)
+
+
