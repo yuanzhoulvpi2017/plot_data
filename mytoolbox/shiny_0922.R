@@ -74,7 +74,7 @@ opendir <- function(dir = getwd()){
 
 ui <- fluidPage(
   titlePanel("欢迎关注微信公众号：pypi"),
-  tags$a(href = "https://zhuanlan.zhihu.com/p/258119118", "➡️请点击这个链接🔗获得使用方法 🚗当前版本为：20200923"),
+  tags$a(href = "https://zhuanlan.zhihu.com/p/258119118", "请点击这个链接获得使用方法 当前版本为：20200923"),
   tags$head(tags$style(HTML(".shiny-notification {
     position:fixed;
     top: calc(50%);
@@ -93,9 +93,9 @@ ui <- fluidPage(
                           dataTableOutput("start_cal_ttest")
                         ))),
              tabPanel("持续更新中",
-                      tags$div("如果有好的想法💡，欢迎和我联系：yuanzhoulvpi@outlook.com"))),
-
-
+                      tags$div("如果有好的想法，欢迎和我联系：yuanzhoulvpi@outlook.com"))),
+  
+  
 )
 
 server <- function(input, output, session) {
@@ -123,7 +123,7 @@ server <- function(input, output, session) {
     req(need_to_t_test_data())
     req(input$sel_colname)
     cal_each_t_test(input$sel_colname, all_data = need_to_t_test_data())
-    })
+  })
   
   
   result_ttest <- reactive({
@@ -137,7 +137,7 @@ server <- function(input, output, session) {
     progress <- Progress$new(max = length(all_colname2))
     on.exit(progress$close())
     
-    progress$set(message = "正在计算中，起飞～✈️")
+    progress$set(message = "正在计算中，起飞～")
     final_result <- data.frame()
     for (i in seq_along(all_colname2)) {
       progress$inc(1)
@@ -158,7 +158,7 @@ server <- function(input, output, session) {
     }
     ttest_filename <- paste0(getwd(), "/pypi_result/", Sys.time(), ".csv")
     write_csv(x = final_ttest, path = ttest_filename)
-    showNotification(paste0("📥data has been saved in: ", ttest_filename), duration = 1000, closeButton = TRUE)
+    showNotification(paste0("data has been saved in: ", ttest_filename), duration = 1000, closeButton = TRUE)
     
     opendir()
     final_ttest
