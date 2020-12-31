@@ -1,3 +1,5 @@
+![工程结果](https://github.com/yuanzhoulvpi2017/plot_data/blob/master/WaterMargin/%E6%88%AA%E5%B1%8F2020-12-31%20%E4%B8%8B%E5%8D%8812.53.58.png)
+
 文件介绍：
 
 1. WaterMargin.Rproj 文件是Rstudio的工程文件。如果电脑上使用的是Rstudio。可以打开这个文件然后Rstudio会自动进入这个工程目录里面。
