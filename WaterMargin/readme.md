@@ -28,7 +28,13 @@
 2. 第二步：calrelation.R应该是第二运行的，但是可以运行也可以不运行，只要有herosrelation.csv即可。
 3. plotnetwork.R 和plotnetwork2.R可以运行也可以不运行，因为分别输出的是network.html和network2.html。这两个图是差不多的，具体细节看文件介绍。
 4. 因为网络图关系太大了，应该使用浏览器打开html文件，Rstudio处理中文和大型的html文件会崩溃。
-5. 
+
+
+参考链接：
+
+1. [百度百科对水浒传的介绍](https://baike.baidu.com/item/%E6%B0%B4%E6%B5%92%E4%BC%A0/348#3_3)
+
+
 
 
 
